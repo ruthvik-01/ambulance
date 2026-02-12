@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: smart-ambulance
+    runtime: python
+    repo: https://github.com/ruthvik-01/ambulance
+    branch: main
+    rootDir: ambulance
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: FLASK_HOST
+        value: "0.0.0.0"
+      - key: SEARCH_RADIUS_KM
+        value: "30"
