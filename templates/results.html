@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏥 Hospital Match Results — Smart Ambulance</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="results-page">
+    <div class="container">
+      <!-- Header -->
+      <header class="results-header">
+        <a href="/" class="back-link">← New SOS</a>
+        <h1>🏥 Hospital Match</h1>
+        <p class="subtitle" id="emergency-badge">Loading...</p>
+      </header>
+
+      <!-- Best Hospital Card -->
+      <div id="best-hospital" class="hospital-card best">
+        <div class="card-loading">
+          <div class="spinner"></div>
+          <p>Finding best hospital...</p>
+        </div>
+      </div>
+
+      <!-- Navigate Button (Primary) -->
+      <div id="nav-section" class="nav-section hidden">
+        <a id="navigate-btn" href="#" target="_blank" class="navigate-button">
+          🗺️ Navigate with Google Maps
+        </a>
+        <p class="nav-hint">Opens Google Maps with fastest route</p>
+      </div>
+
+      <!-- Score Breakdown -->
+      <div id="score-section" class="score-section hidden">
+        <h3>📊 AI Readiness Score Breakdown</h3>
+        <div id="score-bars" class="score-bars"></div>
+      </div>
+
+      <!-- Backup Hospital -->
+      <div id="backup-section" class="backup-section hidden">
+        <h3>🔄 Backup Hospital</h3>
+        <div id="backup-hospital" class="hospital-card backup"></div>
+        <a
+          id="backup-nav-btn"
+          href="#"
+          target="_blank"
+          class="btn btn-secondary btn-full"
+        >
+          Navigate to Backup →
+        </a>
+      </div>
+
+      <!-- All Hospitals Ranked -->
+      <div id="all-section" class="all-section hidden">
+        <h3>📋 All Hospitals Ranked</h3>
+        <div id="all-hospitals" class="all-hospitals-list"></div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <a href="/">🚨 New Emergency</a>
+        <span class="footer-dot">•</span>
+        <a href="/dashboard">🏥 Dashboard</a>
+      </footer>
+    </div>
+
+    <script>
+      const SOS_ID = {{ sos_id }};
+    </script>
+    <script src="/static/js/results.js"></script>
+  </body>
+</html>

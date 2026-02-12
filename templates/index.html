@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚑 Emergency SOS — Smart Ambulance</title>
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="sos-page">
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-content">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring delay-1"></div>
+        <div class="pulse-ring delay-2"></div>
+        <div class="loading-icon">🚑</div>
+        <h2>Finding the best hospital...</h2>
+        <p id="loading-text">
+          Analyzing nearby hospitals & matching facilities
+        </p>
+      </div>
+    </div>
+
+    <!-- GPS Error modal -->
+    <div id="gps-modal" class="modal hidden">
+      <div class="modal-content">
+        <h3>📍 Location Required</h3>
+        <p>
+          We need your location to find nearby hospitals. Please enable GPS or
+          enter coordinates manually.
+        </p>
+        <div class="manual-coords">
+          <input
+            type="number"
+            id="manual-lat"
+            placeholder="Latitude (e.g. 11.0168)"
+            step="any"
+          />
+          <input
+            type="number"
+            id="manual-lng"
+            placeholder="Longitude (e.g. 76.9558)"
+            step="any"
+          />
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="retryGPS()">
+            🔄 Retry GPS
+          </button>
+          <button class="btn btn-primary" onclick="useManualCoords()">
+            ✅ Use Coordinates
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-icon">🚑</div>
+        <h1>Smart Ambulance</h1>
+        <p class="subtitle">AI-Powered Hospital Matching</p>
+      </header>
+
+      <!-- GPS Status -->
+      <div id="gps-status" class="gps-status">
+        <span class="gps-dot"></span>
+        <span id="gps-text">Acquiring GPS location...</span>
+      </div>
+
+      <!-- BIG SOS BUTTON -->
+      <div class="sos-section">
+        <button id="sos-btn" class="sos-button" onclick="triggerSOS()" disabled>
+          <span class="sos-text">SOS</span>
+          <span class="sos-subtext">Tap for Emergency</span>
+        </button>
+        <p class="sos-hint">No login required • One-tap emergency help</p>
+      </div>
+
+      <!-- Emergency Type Selection -->
+      <div class="type-section">
+        <h3>Select Emergency Type</h3>
+        <div class="type-grid">
+          <button
+            class="type-card active"
+            data-type="accident"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🚗</span>
+            <span class="type-label">Accident</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="cardiac"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">❤️</span>
+            <span class="type-label">Cardiac</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="trauma"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🩹</span>
+            <span class="type-label">Trauma</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="maternity"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🤰</span>
+            <span class="type-label">Maternity</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="burns"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🔥</span>
+            <span class="type-label">Burns</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="neuro"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🧠</span>
+            <span class="type-label">Neuro</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="general"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🏥</span>
+            <span class="type-label">General</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Optional: Severity & Notes -->
+      <div class="details-section">
+        <details>
+          <summary>➕ Add more details (optional)</summary>
+          <div class="details-content">
+            <label>Severity Level</label>
+            <div class="severity-btns">
+              <button
+                class="severity-btn"
+                data-severity="low"
+                onclick="selectSeverity(this)"
+              >
+                Low
+              </button>
+              <button
+                class="severity-btn active"
+                data-severity="medium"
+                onclick="selectSeverity(this)"
+              >
+                Medium
+              </button>
+              <button
+                class="severity-btn"
+                data-severity="high"
+                onclick="selectSeverity(this)"
+              >
+                High
+              </button>
+              <button
+                class="severity-btn critical"
+                data-severity="critical"
+                onclick="selectSeverity(this)"
+              >
+                Critical
+              </button>
+            </div>
+            <label>Patient Notes</label>
+            <textarea
+              id="patient-notes"
+              placeholder="e.g., Patient is conscious, bleeding from head..."
+            ></textarea>
+          </div>
+        </details>
+      </div>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <a href="/dashboard">🏥 Hospital Dashboard</a>
+        <span class="footer-dot">•</span>
+        <span>AMRITA Hackathon 2026</span>
+      </footer>
+    </div>
+
+    <script src="/static/js/sos.js"></script>
+  </body>
+</html>
