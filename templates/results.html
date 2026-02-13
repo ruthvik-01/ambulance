@@ -3,70 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🏥 Hospital Match Results — Smart Ambulance</title>
-    <link rel="stylesheet" href="/static/css/style.css" />
+    <title>🏥 Hospital Results</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
-  <body class="results-page">
+  <body>
     <div class="container">
       <!-- Header -->
-      <header class="results-header">
-        <a href="/" class="back-link">← New SOS</a>
-        <h1>🏥 Hospital Match</h1>
-        <p class="subtitle" id="emergency-badge">Loading...</p>
-      </header>
+      <div class="results-header">
+        <a href="/" class="back-link">← Back to SOS</a>
+        <h1>🏥 Hospital Results</h1>
+        <div id="emergency-badge">LOADING…</div>
+      </div>
 
       <!-- Best Hospital Card -->
-      <div id="best-hospital" class="hospital-card best">
+      <div id="best-card">
         <div class="card-loading">
           <div class="spinner"></div>
-          <p>Finding best hospital...</p>
+          <p class="text-dim">Scoring hospitals by readiness…</p>
         </div>
       </div>
 
-      <!-- Navigate Button (Primary) -->
-      <div id="nav-section" class="nav-section hidden">
-        <a id="navigate-btn" href="#" target="_blank" class="navigate-button">
-          🗺️ Navigate with Google Maps
+      <!-- Action: Select Best Hospital -->
+      <div class="nav-section hidden" id="best-nav-section">
+        <a href="#" class="navigate-button" id="select-best-btn">
+          🚑 Dispatch Ambulance to Best Hospital
         </a>
-        <p class="nav-hint">Opens Google Maps with fastest route</p>
+        <p class="nav-hint">
+          An ambulance will be auto-assigned to the nearest driver
+        </p>
       </div>
 
-      <!-- Score Breakdown -->
-      <div id="score-section" class="score-section hidden">
-        <h3>📊 AI Readiness Score Breakdown</h3>
-        <div id="score-bars" class="score-bars"></div>
+      <!-- Score Breakdown (for best) -->
+      <div class="score-section hidden" id="score-section">
+        <h3>📊 Score Breakdown</h3>
+        <div class="score-bars" id="score-bars"></div>
       </div>
 
-      <!-- Backup Hospital -->
-      <div id="backup-section" class="backup-section hidden">
-        <h3>🔄 Backup Hospital</h3>
-        <div id="backup-hospital" class="hospital-card backup"></div>
-        <a
-          id="backup-nav-btn"
-          href="#"
-          target="_blank"
-          class="btn btn-secondary btn-full"
-        >
-          Navigate to Backup →
-        </a>
+      <!-- Backup Hospital Card -->
+      <div id="backup-card" class="hidden"></div>
+
+      <!-- All Other Hospitals -->
+      <div class="all-section hidden" id="all-section">
+        <h3>All Scored Hospitals</h3>
+        <div id="all-hospitals-list"></div>
       </div>
 
-      <!-- All Hospitals Ranked -->
-      <div id="all-section" class="all-section hidden">
-        <h3>📋 All Hospitals Ranked</h3>
-        <div id="all-hospitals" class="all-hospitals-list"></div>
+      <div class="app-footer">
+        <a href="/">Home</a>
+        <span class="footer-dot">·</span>
+        <span class="text-dim">SOS #{{ sos_id }}</span>
       </div>
-
-      <!-- Footer -->
-      <footer class="app-footer">
-        <a href="/">🚨 New Emergency</a>
-        <span class="footer-dot">•</span>
-        <a href="/dashboard">🏥 Dashboard</a>
-      </footer>
     </div>
 
     <script>

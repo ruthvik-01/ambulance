@@ -11,7 +11,7 @@ class Config:
     # Server
     HOST = os.getenv("FLASK_HOST", "0.0.0.0")
     PORT = int(os.getenv("FLASK_PORT", 5000))
-    DEBUG = os.getenv("FLASK_DEBUG", "true").lower() == "true"
+    DEBUG = os.getenv("FLASK_DEBUG", "false").lower() == "true"
     SECRET_KEY = os.getenv("SECRET_KEY", "ambulance-sos-secret-key-2026")
 
     # Google Maps (optional)
@@ -33,3 +33,13 @@ class Config:
 
     # Average ambulance speed for ETA estimation (km/h)
     AVG_AMBULANCE_SPEED_KMH = 40
+
+    # Firebase
+    FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "")
+    FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY", "")
+    FIREBASE_AUTH_DOMAIN = os.getenv("FIREBASE_AUTH_DOMAIN", "")
+    FIREBASE_SERVICE_ACCOUNT_PATH = os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH", "")
+
+    # Driver assignment
+    DRIVER_ACCEPT_TIMEOUT_SEC = int(os.getenv("DRIVER_ACCEPT_TIMEOUT_SEC", 60))
+    LOCATION_UPDATE_INTERVAL_SEC = int(os.getenv("LOCATION_UPDATE_INTERVAL_SEC", 5))

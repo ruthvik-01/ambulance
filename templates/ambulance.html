@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚑 Ambulance Tracking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="ambulance-page">
+    <div class="container">
+      <!-- Header -->
+      <div class="amb-header">
+        <h1>🚑 Ambulance Dispatch</h1>
+        <p class="subtitle" id="status-text">Preparing…</p>
+      </div>
+
+      <!-- Status Timeline -->
+      <div class="request-tracker">
+        <div class="tracker-steps">
+          <div class="tracker-step active" id="step-requested">
+            <div class="step-dot">📝</div>
+            <span>Requested</span>
+          </div>
+          <div class="tracker-line" id="line-1"></div>
+          <div class="tracker-step" id="step-assigned">
+            <div class="step-dot">🚑</div>
+            <span>Assigned</span>
+          </div>
+          <div class="tracker-line" id="line-2"></div>
+          <div class="tracker-step" id="step-accepted">
+            <div class="step-dot">✅</div>
+            <span>Accepted</span>
+          </div>
+          <div class="tracker-line" id="line-3"></div>
+          <div class="tracker-step" id="step-enroute">
+            <div class="step-dot">🏃</div>
+            <span>En Route</span>
+          </div>
+          <div class="tracker-line" id="line-4"></div>
+          <div class="tracker-step" id="step-arrived">
+            <div class="step-dot">📍</div>
+            <span>Arrived</span>
+          </div>
+          <div class="tracker-line" id="line-5"></div>
+          <div class="tracker-step" id="step-completed">
+            <div class="step-dot">🏁</div>
+            <span>Done</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Waiting for Driver / Driver Info dynamically toggled -->
+      <div id="waiting-section">
+        <div class="waiting-driver-card" id="waiting-card">
+          <div class="waiting-pulse">🔍</div>
+          <h3>Assigning Nearest Driver</h3>
+          <p>
+            Looking for the closest available ambulance<span
+              class="loading-dots"
+            ></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Driver Info Card (hidden initially) -->
+      <div class="driver-info-card hidden" id="driver-card">
+        <div class="driver-info-header">
+          <span class="driver-avatar">🚑</span>
+          <div>
+            <strong id="driver-name">—</strong>
+            <span class="text-dim" id="driver-vehicle">—</span>
+          </div>
+          <a href="#" id="driver-call" class="btn btn-sm btn-outline"
+            >📞 Call</a
+          >
+        </div>
+        <div class="driver-eta-bar">
+          <span>Estimated Arrival</span>
+          <strong id="driver-eta">—</strong>
+        </div>
+        <div class="status-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+          </div>
+          <div class="progress-labels">
+            <span>Assigned</span>
+            <span>En Route</span>
+            <span>Arrived</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hospital Info Card -->
+      <div class="amb-hospital-card hidden" id="hospital-card">
+        <span class="amb-card-badge">🏥 Destination Hospital</span>
+        <h2 class="amb-card-name" id="hosp-name">—</h2>
+        <p class="amb-card-address" id="hosp-address">—</p>
+        <div class="amb-card-stats">
+          <div class="stat-item">
+            <div class="stat-value score" id="hosp-score">—</div>
+            <div class="stat-label">Score</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value distance" id="hosp-dist">—</div>
+            <div class="stat-label">km</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value eta" id="hosp-eta">—</div>
+            <div class="stat-label">ETA</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="hosp-beds">—</div>
+            <div class="stat-label">ICU Beds</div>
+          </div>
+        </div>
+        <div class="amb-card-phone">
+          📞 <a href="#" id="hosp-phone-link">—</a>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="amb-actions hidden" id="amb-actions">
+        <a
+          href="#"
+          id="nav-hospital-btn"
+          class="amb-action-btn navigate"
+          target="_blank"
+        >
+          <span class="action-icon">🗺️</span>
+          <div class="action-text">
+            <strong>Navigate to Hospital</strong>
+            <span>Open in Google Maps</span>
+          </div>
+        </a>
+        <a
+          href="#"
+          id="nav-driver-btn"
+          class="amb-action-btn track"
+          target="_blank"
+        >
+          <span class="action-icon">📍</span>
+          <div class="action-text">
+            <strong>See Driver Location</strong>
+            <span>Open in Google Maps</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Event Log -->
+      <div class="details-section" style="margin-top: 16px">
+        <details>
+          <summary>Event Timeline</summary>
+          <div class="details-content">
+            <div id="event-log" class="sos-feed" style="max-height: 300px">
+              <div class="feed-empty">Loading events…</div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="app-footer">
+        <a href="/">New SOS</a>
+        <span class="footer-dot">·</span>
+        <span class="text-dim">SOS #{{ sos_id }}</span>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      const SOS_ID = {{ sos_id }};
+      const HOSPITAL_ID = {{ hospital_id }};
+    </script>
+    <script src="/static/js/ambulance.js"></script>
+  </body>
+</html>

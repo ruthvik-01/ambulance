@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔧 Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="admin-page">
+    <div class="container admin-container">
+      <!-- SOS Alert Banner (hidden) -->
+      <div class="sos-alert-banner hidden" id="sos-alert-banner">
+        <div class="alert-content">
+          <span class="alert-icon">🚨</span>
+          <div class="alert-text">
+            <strong>New SOS Request!</strong>
+            <span id="alert-sos-detail">—</span>
+          </div>
+          <button class="alert-close" onclick="dismissAlert()">✕</button>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="admin-header">
+        <div>
+          <h1>🔧 Admin Dashboard</h1>
+          <p class="subtitle">Monitor &amp; manage ambulance dispatch</p>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <span class="driver-status-badge available" id="connection-badge"
+            >● Live</span
+          >
+          <button class="btn btn-sm btn-secondary" onclick="adminLogout()">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Login Section (hidden when authenticated) -->
+      <div id="admin-login-section" class="hidden">
+        <div class="login-card">
+          <h3>🔐 Admin Sign In</h3>
+          <div class="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              id="admin-email"
+              placeholder="admin@example.com"
+            />
+          </div>
+          <div class="form-field">
+            <label>Password</label>
+            <input
+              type="password"
+              id="admin-password"
+              placeholder="Enter password"
+            />
+          </div>
+          <button class="btn btn-primary btn-full" onclick="adminLogin()">
+            Sign In
+          </button>
+          <div id="admin-feedback" class="feedback hidden"></div>
+          <div class="login-divider">or</div>
+          <button class="btn btn-secondary btn-full" onclick="skipAdminAuth()">
+            Continue without login (Demo)
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Dashboard (shown when authenticated) -->
+      <div id="admin-dashboard" class="hidden">
+        <!-- Stats Row -->
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+          "
+          id="stats-row"
+        >
+          <div class="glass-card" style="text-align: center; padding: 14px">
+            <div
+              style="font-size: 28px; font-weight: 800; color: var(--danger)"
+              id="stat-active"
+            >
+              0
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              "
+            >
+              Active
+            </div>
+          </div>
+          <div class="glass-card" style="text-align: center; padding: 14px">
+            <div
+              style="font-size: 28px; font-weight: 800; color: var(--success)"
+              id="stat-completed"
+            >
+              0
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              "
+            >
+              Completed
+            </div>
+          </div>
+          <div class="glass-card" style="text-align: center; padding: 14px">
+            <div
+              style="
+                font-size: 28px;
+                font-weight: 800;
+                color: var(--primary-light);
+              "
+              id="stat-drivers"
+            >
+              0
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              "
+            >
+              Drivers
+            </div>
+          </div>
+          <div class="glass-card" style="text-align: center; padding: 14px">
+            <div
+              style="font-size: 28px; font-weight: 800; color: var(--warning)"
+              id="stat-hospitals"
+            >
+              0
+            </div>
+            <div
+              style="
+                font-size: 11px;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              "
+            >
+              Hospitals
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+          <button class="tab-btn active" onclick="switchTab('requests', this)">
+            📋 Requests
+          </button>
+          <button class="tab-btn" onclick="switchTab('drivers', this)">
+            🚑 Drivers
+          </button>
+          <button class="tab-btn" onclick="switchTab('events', this)">
+            📡 Events
+          </button>
+          <button class="tab-btn" onclick="switchTab('hospitals', this)">
+            🏥 Hospitals
+          </button>
+        </div>
+
+        <!-- Tab: Requests -->
+        <div class="tab-content active" id="tab-requests">
+          <div class="section-header">
+            <h3>SOS Requests</h3>
+            <div style="display: flex; gap: 6px">
+              <button
+                class="btn btn-sm btn-secondary"
+                id="filter-all"
+                onclick="filterRequests('all')"
+              >
+                All
+              </button>
+              <button
+                class="btn btn-sm btn-primary"
+                id="filter-active"
+                onclick="filterRequests('active')"
+              >
+                Active
+              </button>
+            </div>
+          </div>
+          <div class="admin-list" id="requests-list">
+            <div class="loading-text">Loading requests…</div>
+          </div>
+
+          <!-- Reassign Form -->
+          <div class="admin-form mt-4" id="reassign-form" style="display: none">
+            <h4>🔄 Manual Reassignment</h4>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>SOS Request</label>
+                <select class="form-select" id="reassign-sos"></select>
+              </div>
+              <div class="form-group">
+                <label>New Ambulance</label>
+                <select class="form-select" id="reassign-amb">
+                  <option value="">Auto (nearest)</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-sm btn-secondary" onclick="hideReassign()">
+                Cancel
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="submitReassign()">
+                Reassign
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Drivers -->
+        <div class="tab-content" id="tab-drivers">
+          <div class="section-header">
+            <h3>Ambulance Fleet</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadDrivers()">
+              Refresh
+            </button>
+          </div>
+          <div class="admin-list" id="drivers-list">
+            <div class="loading-text">Loading drivers…</div>
+          </div>
+        </div>
+
+        <!-- Tab: Events -->
+        <div class="tab-content" id="tab-events">
+          <div class="section-header">
+            <h3>Live Event Feed</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadEvents()">
+              Refresh
+            </button>
+          </div>
+          <div class="sos-feed" id="events-feed">
+            <div class="feed-empty">Loading events…</div>
+          </div>
+        </div>
+
+        <!-- Tab: Hospitals -->
+        <div class="tab-content" id="tab-hospitals">
+          <div class="section-header">
+            <h3>Hospital Management</h3>
+            <button class="btn btn-sm btn-secondary" onclick="loadHospitals()">
+              Refresh
+            </button>
+          </div>
+          <div class="admin-list" id="hospitals-list">
+            <div class="loading-text">Loading hospitals…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-footer">
+        <a href="/">User SOS</a>
+        <span class="footer-dot">·</span>
+        <a href="/driver">Driver Portal</a>
+      </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+      const FIREBASE_CONFIG = {
+        apiKey: "{{ firebase_api_key }}",
+        authDomain: "{{ firebase_auth_domain }}",
+        projectId: "{{ firebase_project_id }}",
+      };
+      if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "None") {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+    </script>
+    <script src="/static/js/admin.js"></script>
+  </body>
+</html>

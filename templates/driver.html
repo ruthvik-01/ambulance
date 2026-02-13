@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚑 Driver Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+  </head>
+  <body class="driver-page">
+    <div class="container">
+      <!-- Header -->
+      <div class="driver-header">
+        <h1>🚑 Dashboard</h1>
+        <div>
+          <span class="driver-status-badge available" id="driver-badge"
+            >Available</span
+          >
+        </div>
+      </div>
+
+      <!-- Driver Info Bar -->
+      <div class="glass-card mb-4" id="driver-info-bar">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <span style="font-size: 36px">👤</span>
+          <div>
+            <strong id="d-driver-name" style="font-size: 16px">—</strong>
+            <div class="text-dim" style="font-size: 13px" id="d-vehicle-info">
+              —
+            </div>
+          </div>
+          <button
+            class="btn btn-sm btn-secondary"
+            style="margin-left: auto"
+            onclick="logout()"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Waiting State -->
+      <div id="waiting-state">
+        <div class="driver-waiting">
+          <div class="waiting-icon">📡</div>
+          <h3>Waiting for Requests</h3>
+          <p>You'll be notified when a new SOS request arrives</p>
+          <div class="pulse-dot"></div>
+        </div>
+      </div>
+
+      <!-- Active Request Section (hidden initially) -->
+      <div class="hidden" id="active-request">
+        <!-- Alert Banner -->
+        <div class="request-alert" id="request-alert">
+          <span class="alert-flash">🚨</span>
+          <div>
+            <strong>Incoming SOS Request!</strong>
+            <span class="text-dim" id="alert-detail">—</span>
+          </div>
+        </div>
+
+        <!-- Patient Info -->
+        <div class="driver-card-section">
+          <h4>👤 Patient Info</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Emergency</span>
+              <span class="info-value" id="req-type">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Severity</span>
+              <span class="info-value" id="req-severity">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Location</span>
+              <span class="info-value" id="req-location">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Distance</span>
+              <span class="info-value" id="req-distance">—</span>
+            </div>
+          </div>
+          <div style="margin-top: 10px">
+            <span class="info-label">Notes</span>
+            <p
+              class="info-value"
+              id="req-notes"
+              style="font-size: 13px; color: var(--text-secondary)"
+            >
+              —
+            </p>
+          </div>
+        </div>
+
+        <!-- Hospital Info -->
+        <div class="driver-card-section">
+          <h4>🏥 Destination Hospital</h4>
+          <div class="info-grid">
+            <div class="info-item" style="grid-column: 1/-1">
+              <span class="info-label">Hospital</span>
+              <span class="info-value" id="req-hospital">—</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">H. Location</span>
+              <span class="info-value" id="req-hospital-loc">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons — context-dependent -->
+        <div class="driver-actions" id="driver-actions">
+          <!-- Populated by JS based on status -->
+        </div>
+      </div>
+
+      <div class="app-footer">
+        <a href="/">User SOS</a>
+        <span class="footer-dot">·</span>
+        <a href="/admin">Admin</a>
+      </div>
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+      const FIREBASE_CONFIG = {
+        apiKey: "{{ firebase_api_key }}",
+        authDomain: "{{ firebase_auth_domain }}",
+        projectId: "{{ firebase_project_id }}",
+      };
+      if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "None") {
+        firebase.initializeApp(FIREBASE_CONFIG);
+      }
+    </script>
+    <script src="/static/js/driver.js"></script>
+  </body>
+</html>

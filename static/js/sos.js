@@ -1,134 +1,106 @@
 /**
- * 🚨 SOS Page — Main emergency trigger logic
- * Handles GPS acquisition, emergency type selection, and SOS submission.
+ * 🚑 SOS Module — GPS + Emergency Type + SOS Submission
+ * Public (no auth). Sends SOS request with GPS coords & emergency type.
  */
 
-// ─── State ──────────────────────────────────────
 let userLat = null;
 let userLng = null;
+let selectedType = 'cardiac';
+let selectedSeverity = 'medium';
 let gpsReady = false;
-let selectedType = "accident";
-let selectedSeverity = "medium";
 
-// ─── GPS ────────────────────────────────────────
+// ─── GPS ─────────────────────────────────────────
 function initGPS() {
-    const statusDot = document.querySelector(".gps-dot");
-    const statusText = document.getElementById("gps-text");
-
     if (!navigator.geolocation) {
-        statusDot.classList.add("error");
-        statusText.textContent = "GPS not supported. Enter location manually.";
-        showGPSModal();
+        setGPSStatus('error', 'Geolocation not supported');
+        showManualModal();
         return;
     }
-
     navigator.geolocation.getCurrentPosition(
-        (pos) => {
+        pos => {
             userLat = pos.coords.latitude;
             userLng = pos.coords.longitude;
             gpsReady = true;
-            statusDot.classList.add("active");
-            statusText.textContent = `📍 ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
-            document.getElementById("sos-btn").disabled = false;
+            setGPSStatus('active', `📍 ${userLat.toFixed(5)}, ${userLng.toFixed(5)}`);
+            document.getElementById('sos-btn').disabled = false;
+            document.getElementById('sos-hint').textContent = 'Tap SOS to send emergency request';
         },
-        (err) => {
-            console.warn("GPS error:", err.message);
-            statusDot.classList.add("error");
-            statusText.textContent = "GPS unavailable. Tap to enter manually.";
-            document.querySelector(".gps-status").style.cursor = "pointer";
-            document.querySelector(".gps-status").onclick = showGPSModal;
-            // Enable SOS with default location for demo
-            enableDemoMode();
+        err => {
+            console.warn('GPS Error:', err.message);
+            setGPSStatus('error', 'Location access denied');
+            document.getElementById('sos-hint').textContent = 'Enable location or enter manually';
+            showManualModal();
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 }
 
-function enableDemoMode() {
-    // Default to Coimbatore center for demo purposes
-    userLat = 11.0168;
-    userLng = 76.9558;
-    gpsReady = true;
-    document.getElementById("sos-btn").disabled = false;
-    const statusText = document.getElementById("gps-text");
-    statusText.textContent = `📍 Demo: ${userLat}, ${userLng} (tap to change)`;
-    document.querySelector(".gps-dot").classList.add("active");
-}
-
-function showGPSModal() {
-    document.getElementById("gps-modal").classList.remove("hidden");
+function setGPSStatus(state, text) {
+    const dot = document.getElementById('gps-dot');
+    const txt = document.getElementById('gps-text');
+    dot.className = 'gps-dot ' + state;
+    txt.textContent = text;
 }
 
 function retryGPS() {
-    document.getElementById("gps-modal").classList.add("hidden");
+    document.getElementById('manual-modal').classList.add('hidden');
+    setGPSStatus('', 'Retrying GPS…');
     initGPS();
 }
 
-function useManualCoords() {
-    const lat = parseFloat(document.getElementById("manual-lat").value);
-    const lng = parseFloat(document.getElementById("manual-lng").value);
+function showManualModal() {
+    document.getElementById('manual-modal').classList.remove('hidden');
+}
 
+function useManualCoords() {
+    const lat = parseFloat(document.getElementById('manual-lat').value);
+    const lng = parseFloat(document.getElementById('manual-lng').value);
     if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-        alert("Please enter valid coordinates.\nLatitude: -90 to 90\nLongitude: -180 to 180");
+        alert('Please enter valid coordinates (lat: -90 to 90, lng: -180 to 180)');
         return;
     }
-
     userLat = lat;
     userLng = lng;
     gpsReady = true;
-
-    document.getElementById("gps-modal").classList.add("hidden");
-    document.querySelector(".gps-dot").classList.add("active");
-    document.getElementById("gps-text").textContent = `📍 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-    document.getElementById("sos-btn").disabled = false;
+    document.getElementById('manual-modal').classList.add('hidden');
+    setGPSStatus('active', `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)} (manual)`);
+    document.getElementById('sos-btn').disabled = false;
+    document.getElementById('sos-hint').textContent = 'Tap SOS to send emergency request';
 }
 
-// ─── Emergency Type Selection ───────────────────
+// ─── Emergency Type ──────────────────────────────
 function selectType(el) {
-    document.querySelectorAll(".type-card").forEach(c => c.classList.remove("active"));
-    el.classList.add("active");
+    document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
     selectedType = el.dataset.type;
 }
 
-// ─── Severity Selection ─────────────────────────
+// ─── Severity ────────────────────────────────────
 function selectSeverity(el) {
-    document.querySelectorAll(".severity-btn").forEach(b => b.classList.remove("active"));
-    el.classList.add("active");
+    document.querySelectorAll('.severity-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
     selectedSeverity = el.dataset.severity;
 }
 
-// ─── SOS Trigger ────────────────────────────────
-async function triggerSOS() {
-    if (!gpsReady) {
-        showGPSModal();
+// ─── Send SOS ────────────────────────────────────
+async function sendSOS() {
+    if (!gpsReady || userLat === null) {
+        alert('GPS not ready. Please wait or enter coordinates manually.');
         return;
     }
 
+    const btn = document.getElementById('sos-btn');
+    btn.disabled = true;
+
     // Show loading
-    const overlay = document.getElementById("loading-overlay");
-    overlay.classList.remove("hidden");
+    document.getElementById('loading').classList.remove('hidden');
 
-    const loadingText = document.getElementById("loading-text");
-    const messages = [
-        "Scanning nearby hospitals...",
-        "Checking ICU bed availability...",
-        "Matching specialists to emergency type...",
-        "Calculating readiness scores...",
-        "Selecting the best hospital..."
-    ];
-
-    let msgIndex = 0;
-    const msgInterval = setInterval(() => {
-        loadingText.textContent = messages[msgIndex % messages.length];
-        msgIndex++;
-    }, 800);
-
-    const notes = document.getElementById("patient-notes")?.value || "";
+    const notes = document.getElementById('patient-notes')?.value || '';
 
     try {
-        const response = await fetch("/api/sos", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        const res = await fetch('/api/sos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 latitude: userLat,
                 longitude: userLng,
@@ -138,24 +110,22 @@ async function triggerSOS() {
             })
         });
 
-        const data = await response.json();
-        clearInterval(msgInterval);
+        const data = await res.json();
 
-        if (response.ok && data.success) {
-            // Store results and redirect
-            sessionStorage.setItem("sos_result", JSON.stringify(data));
+        if (res.ok && data.success) {
+            // Redirect to results page
             window.location.href = `/results/${data.sos_id}`;
         } else {
-            overlay.classList.add("hidden");
-            alert(`Error: ${data.error || "Something went wrong"}`);
+            document.getElementById('loading').classList.add('hidden');
+            btn.disabled = false;
+            alert('Error: ' + (data.error || 'Unknown error'));
         }
-    } catch (err) {
-        clearInterval(msgInterval);
-        overlay.classList.add("hidden");
-        console.error("SOS error:", err);
-        alert("Network error. Please check your connection and try again.");
+    } catch (e) {
+        document.getElementById('loading').classList.add('hidden');
+        btn.disabled = false;
+        alert('Network error: ' + e.message);
     }
 }
 
-// ─── Init ───────────────────────────────────────
-document.addEventListener("DOMContentLoaded", initGPS);
+// ─── Init ────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', initGPS);

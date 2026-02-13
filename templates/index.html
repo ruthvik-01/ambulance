@@ -3,98 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🚑 Emergency SOS — Smart Ambulance</title>
-    <link rel="stylesheet" href="/static/css/style.css" />
+    <title>🚑 Smart Ambulance — Emergency SOS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="/static/css/style.css" />
   </head>
-  <body class="sos-page">
-    <!-- Loading overlay -->
-    <div id="loading-overlay" class="loading-overlay hidden">
-      <div class="loading-content">
-        <div class="pulse-ring"></div>
-        <div class="pulse-ring delay-1"></div>
-        <div class="pulse-ring delay-2"></div>
-        <div class="loading-icon">🚑</div>
-        <h2>Finding the best hospital...</h2>
-        <p id="loading-text">
-          Analyzing nearby hospitals & matching facilities
-        </p>
-      </div>
-    </div>
-
-    <!-- GPS Error modal -->
-    <div id="gps-modal" class="modal hidden">
-      <div class="modal-content">
-        <h3>📍 Location Required</h3>
-        <p>
-          We need your location to find nearby hospitals. Please enable GPS or
-          enter coordinates manually.
-        </p>
-        <div class="manual-coords">
-          <input
-            type="number"
-            id="manual-lat"
-            placeholder="Latitude (e.g. 11.0168)"
-            step="any"
-          />
-          <input
-            type="number"
-            id="manual-lng"
-            placeholder="Longitude (e.g. 76.9558)"
-            step="any"
-          />
-        </div>
-        <div class="modal-actions">
-          <button class="btn btn-secondary" onclick="retryGPS()">
-            🔄 Retry GPS
-          </button>
-          <button class="btn btn-primary" onclick="useManualCoords()">
-            ✅ Use Coordinates
-          </button>
-        </div>
-      </div>
-    </div>
-
+  <body>
     <div class="container">
       <!-- Header -->
-      <header class="app-header">
+      <div class="app-header">
         <div class="header-icon">🚑</div>
         <h1>Smart Ambulance</h1>
-        <p class="subtitle">AI-Powered Hospital Matching</p>
-      </header>
-
-      <!-- GPS Status -->
-      <div id="gps-status" class="gps-status">
-        <span class="gps-dot"></span>
-        <span id="gps-text">Acquiring GPS location...</span>
+        <p class="subtitle">AI-Powered Hospital Routing &amp; Dispatch</p>
       </div>
 
-      <!-- BIG SOS BUTTON -->
-      <div class="sos-section">
-        <button id="sos-btn" class="sos-button" onclick="triggerSOS()" disabled>
-          <span class="sos-text">SOS</span>
-          <span class="sos-subtext">Tap for Emergency</span>
-        </button>
-        <p class="sos-hint">No login required • One-tap emergency help</p>
+      <!-- GPS Status -->
+      <div class="gps-status" id="gps-status">
+        <span class="gps-dot" id="gps-dot"></span>
+        <span id="gps-text">Acquiring GPS location…</span>
       </div>
 
       <!-- Emergency Type Selection -->
       <div class="type-section">
-        <h3>Select Emergency Type</h3>
-        <div class="type-grid">
+        <h3>Emergency Type</h3>
+        <div class="type-grid" id="type-grid">
           <button
             class="type-card active"
-            data-type="accident"
-            onclick="selectType(this)"
-          >
-            <span class="type-icon">🚗</span>
-            <span class="type-label">Accident</span>
-          </button>
-          <button
-            class="type-card"
             data-type="cardiac"
             onclick="selectType(this)"
           >
@@ -111,6 +48,26 @@
           </button>
           <button
             class="type-card"
+            data-type="stroke"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">🧠</span>
+            <span class="type-label">Stroke</span>
+          </button>
+          <button class="type-card" data-type="burn" onclick="selectType(this)">
+            <span class="type-icon">🔥</span>
+            <span class="type-label">Burn</span>
+          </button>
+          <button
+            class="type-card"
+            data-type="pediatric"
+            onclick="selectType(this)"
+          >
+            <span class="type-icon">👶</span>
+            <span class="type-label">Pediatric</span>
+          </button>
+          <button
+            class="type-card"
             data-type="maternity"
             onclick="selectType(this)"
           >
@@ -119,19 +76,11 @@
           </button>
           <button
             class="type-card"
-            data-type="burns"
+            data-type="respiratory"
             onclick="selectType(this)"
           >
-            <span class="type-icon">🔥</span>
-            <span class="type-label">Burns</span>
-          </button>
-          <button
-            class="type-card"
-            data-type="neuro"
-            onclick="selectType(this)"
-          >
-            <span class="type-icon">🧠</span>
-            <span class="type-label">Neuro</span>
+            <span class="type-icon">🫁</span>
+            <span class="type-label">Respiratory</span>
           </button>
           <button
             class="type-card"
@@ -144,12 +93,21 @@
         </div>
       </div>
 
-      <!-- Optional: Severity & Notes -->
+      <!-- SOS Button -->
+      <div class="sos-section">
+        <button class="sos-button" id="sos-btn" disabled onclick="sendSOS()">
+          <span class="sos-text">SOS</span>
+          <span class="sos-subtext">Tap to Send</span>
+        </button>
+        <p class="sos-hint" id="sos-hint">Waiting for GPS signal…</p>
+      </div>
+
+      <!-- Optional Details -->
       <div class="details-section">
         <details>
-          <summary>➕ Add more details (optional)</summary>
+          <summary>Additional Details (Optional)</summary>
           <div class="details-content">
-            <label>Severity Level</label>
+            <label>Severity</label>
             <div class="severity-btns">
               <button
                 class="severity-btn"
@@ -183,18 +141,64 @@
             <label>Patient Notes</label>
             <textarea
               id="patient-notes"
-              placeholder="e.g., Patient is conscious, bleeding from head..."
+              placeholder="e.g. Chest pain, difficulty breathing, age 65…"
+              rows="3"
             ></textarea>
           </div>
         </details>
       </div>
 
       <!-- Footer -->
-      <footer class="app-footer">
-        <a href="/dashboard">🏥 Hospital Dashboard</a>
-        <span class="footer-dot">•</span>
-        <span>AMRITA Hackathon 2026</span>
-      </footer>
+      <div class="app-footer">
+        <a href="/driver">Driver Portal</a>
+        <span class="footer-dot">·</span>
+        <a href="/admin">Admin Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loading">
+      <div class="loading-content">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring delay-1"></div>
+        <div class="pulse-ring delay-2"></div>
+        <div class="loading-icon">🚑</div>
+        <h2>Finding Best Hospital</h2>
+        <p>Scoring hospitals by readiness…</p>
+      </div>
+    </div>
+
+    <!-- Manual Coordinates Modal -->
+    <div class="modal hidden" id="manual-modal">
+      <div class="modal-content">
+        <h3>📍 Enter Coordinates</h3>
+        <p>
+          We couldn't get your GPS location. Enter manually or allow location
+          access.
+        </p>
+        <div class="manual-coords">
+          <input
+            type="number"
+            id="manual-lat"
+            placeholder="Latitude"
+            step="any"
+          />
+          <input
+            type="number"
+            id="manual-lng"
+            placeholder="Longitude"
+            step="any"
+          />
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="retryGPS()">
+            Retry GPS
+          </button>
+          <button class="btn btn-primary" onclick="useManualCoords()">
+            Use Coords
+          </button>
+        </div>
+      </div>
     </div>
 
     <script src="/static/js/sos.js"></script>
